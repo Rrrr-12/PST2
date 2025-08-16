@@ -260,13 +260,6 @@ def menu_loop():
         else:
             print("Invalid option. Please choose again.")
 
-# Keep the module import-friendly; only run CLI when executed as a script
 if __name__ == "__main__":
-    # Switch to menu_loop() for Fragment 2.4 runtime
     menu_loop()
 
-
-# --- Temporary entry point (mainly Fragment 2.1 test) ---
-if __name__ == "__main__":
-    load_data()
-    save_data()
