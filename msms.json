@@ -2,6 +2,6 @@
     "students": [],
     "teachers": [],
     "attendance": [],
-    "next_student_id": 1,
-    "next_teacher_id": 1
+    "next_student_id": 4,
+    "next_teacher_id": 4
 }
