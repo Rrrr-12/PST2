@@ -155,6 +155,115 @@ def print_student_card(student_id: int) -> str:
 
     print(f"Printed student card to {filename}.")
     return filename
+# --- CLI Main Loop (Fragment 2.4) ---
+def _input_int(prompt: str) -> int:
+    """Read an integer from stdin; reprompt until valid."""
+    while True:
+        raw = input(prompt).strip()
+        try:
+            return int(raw)
+        except ValueError:
+            print("Please enter a valid integer.")
+
+def _list_students():
+    if not app_data.get("students"):
+        print("(no students)")
+        return
+    print("Students:")
+    for s in app_data["students"]:
+        courses = ", ".join(s.get("enrolled_in", []))
+        print(f"  ID={s['id']}, Name={s['name']}, Enrolled In=[{courses}]")
+
+def _list_teachers():
+    if not app_data.get("teachers"):
+        print("(no teachers)")
+        return
+    print("Teachers:")
+    for t in app_data["teachers"]:
+        print(f"  ID={t['id']}, Name={t['name']}, Speciality={t['speciality']}")
+
+def menu_loop():
+    """Interactive menu for receptionist and admin actions."""
+    load_data()
+    print("Welcome to MSMS (Fragments 2.1~2.4)")
+    while True:
+        print("\n--- Main Menu ---")
+        print("1) Check-in a student")
+        print("2) Print student card")
+        print("3) Update a teacher")
+        print("4) Remove a student")
+        print("5) List students (view only)")
+        print("6) List teachers (view only)")
+        print("0) Exit")
+        choice = input("Select an option: ").strip()
+
+        if choice == "1":
+            # Check-in
+            _list_students()
+            sid = _input_int("Enter student ID: ")
+            course = input("Enter course name (e.g., 'Guitar 101'): ").strip()
+            if not course:
+                print("Course name cannot be empty.")
+                continue
+            check_in(sid, course)
+            save_data()  # persist immediately
+
+        elif choice == "2":
+            # Print student card
+            _list_students()
+            sid = _input_int("Enter student ID: ")
+            try:
+                path = print_student_card(sid)
+                print(f"Student card created at: {path}")
+            except ValueError as e:
+                print(str(e))
+            # no data mutation, no save needed
+
+        elif choice == "3":
+            # Update teacher
+            _list_teachers()
+            tid = _input_int("Enter teacher ID: ")
+            print("Leave a field blank to skip updating it.")
+            new_name = input("New name: ").strip()
+            new_spec = input("New speciality: ").strip()
+
+            payload = {}
+            if new_name:
+                payload["name"] = new_name
+            if new_spec:
+                payload["speciality"] = new_spec
+
+            if not payload:
+                print("Nothing to update.")
+            else:
+                ok = update_teacher(tid, **payload)
+                if ok:
+                    save_data()  # persist immediately
+
+        elif choice == "4":
+            # Remove student
+            _list_students()
+            sid = _input_int("Enter student ID to remove: ")
+            if remove_student(sid):
+                save_data()  # persist immediately
+
+        elif choice == "5":
+            _list_students()
+
+        elif choice == "6":
+            _list_teachers()
+
+        elif choice == "0":
+            print("Goodbye!")
+            break
+
+        else:
+            print("Invalid option. Please choose again.")
+
+# Keep the module import-friendly; only run CLI when executed as a script
+if __name__ == "__main__":
+    # Switch to menu_loop() for Fragment 2.4 runtime
+    menu_loop()
 
 
 # --- Temporary entry point (mainly Fragment 2.1 test) ---
